@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using ZeroResult.Core.Errors;
 using ZeroResult.Core.Models;
 

@@ -18,10 +18,10 @@ public static partial class StackResult
     /// </summary>
     /// <typeparam name="T">The type of the successful result value</typeparam>
     /// <typeparam name="TError">The error type implementing <see cref="IError"/></typeparam>
-    /// <param name="value">The success value (passed by readonly reference)</param>
+    /// /// <param name="value">The value to return on success</param>
     /// <returns>A successful result containing the value</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static StackResult<T, TError> Success<T, TError>(in T value)
+    public static StackResult<T, TError> Success<T, TError>(T value)
         where TError : IError
         => new(value);
 
@@ -30,10 +30,10 @@ public static partial class StackResult
     /// </summary>
     /// <typeparam name="T">The expected value type when successful</typeparam>
     /// <typeparam name="TError">The error type implementing <see cref="IError"/></typeparam>
-    /// <param name="error">The error value (passed by readonly reference)</param>
+    /// <param name="error">The error that caused the failure</param>
     /// <returns>A failed result containing the error</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static StackResult<T, TError> Failure<T, TError>(in TError error)
+    public static StackResult<T, TError> Failure<T, TError>(TError error)
         where TError : IError
         => new(error);
 }

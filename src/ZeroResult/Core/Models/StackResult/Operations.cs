@@ -1,0 +1,182 @@
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using ZeroResult.Core.Errors;
+
+namespace ZeroResult.Core.Models;
+
+public readonly ref partial struct StackResult<T, TError>
+    where TError : IError
+{
+    /// <summary>
+    /// Maps the successful value to a new type using the provided mapper function.
+    /// If the result is a failure, it returns the error unchanged.
+    /// </summary>
+    /// <typeparam name="TResult">The type of the mapped successful value.</typeparam>
+    /// <param name="mapper">The function to map the successful value.</param>
+    /// <returns>A new <see cref="StackResult{TResult, TError}"/> with the mapped value or the original error.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the mapper function is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public StackResult<TResult, TError> Map<TResult>(Func<T, TResult> mapper)
+    {
+        if (_isSuccess)
+        {
+            Debug.Assert(mapper is not null, "Mapper function should not be null.");
+            Debug.Assert(_value is not null, "Value should not be null when mapping a success.");
+
+            return new(mapper(_value));
+        }
+
+        Debug.Assert(_error is not null, "Error should not be null when mapping a failure.");
+
+        return new(_error);
+    }
+
+#if NET9_0_OR_GREATER
+
+    /// <summary>
+    /// Binds the successful value to a new <see cref="StackResult{TResult, TError}"/> using the provided binder function.
+    /// If the result is a failure, it returns the error unchanged.
+    /// </summary>
+    /// <typeparam name="TResult">The type of the result value returned by the binder.</typeparam>
+    /// <param name="binder">The function to bind the successful value to a new result.</param>
+    /// <returns>A new <see cref="StackResult{TResult, TError}"/> with the result of the binder or the original error.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the binder function is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public StackResult<TResult, TError> Bind<TResult>(Func<T, StackResult<TResult, TError>> binder)
+    {
+        if (_isSuccess)
+        {
+            Debug.Assert(binder is not null, "Binder function should not be null.");
+            Debug.Assert(_value is not null, "Value should not be null when binding a success.");
+
+            return binder(_value);
+        }
+
+        Debug.Assert(_error is not null, "Error should not be null when binding a failure.");
+
+        return new(_error);
+    }
+
+#endif
+
+    /// <summary>
+    /// Ensures that the successful value satisfies a given predicate.
+    /// If the predicate is not satisfied, it returns a new failure result with the provided error factory.
+    /// If the result is a failure, it returns the error unchanged.
+    /// </summary>
+    /// <param name="predicate">The predicate function to check the successful value.</param>
+    /// <param name="errorFactory">The function to create an error if the predicate is not satisfied.</param>
+    /// <returns>A new <see cref="StackResult{T, TError}"/> with the original value if the predicate is satisfied, or a failure result if not.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the predicate or error factory function is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public StackResult<T, TError> Ensure(Func<T, bool> predicate, Func<TError> errorFactory)
+    {
+        Debug.Assert(predicate is not null, "Predicate function should not be null.");
+        Debug.Assert(_value is not null, "Value should not be null when ensuring a success.");
+
+        if (_isSuccess && predicate(_value) == false)
+        {
+            Debug.Assert(errorFactory is not null, "Error factory function should not be null.");
+
+            return new(errorFactory());
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Executes an action if the result is successful.
+    /// If the result is a failure, the action is not executed.
+    /// </summary>
+    /// <param name="action">The action to execute on success.</param>
+    /// <returns>The current <see cref="StackResult{T, TError}"/> instance.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the action is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public StackResult<T, TError> OnSuccess(Action<T> action)
+    {
+        if (_isSuccess)
+        {
+            Debug.Assert(action is not null, "Action should not be null.");
+            Debug.Assert(_value is not null, "Value should not be null when executing action on success.");
+
+            action(_value);
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Executes an action if the result is a failure.
+    /// If the result is successful, the action is not executed.
+    /// </summary>
+    /// <param name="action">The action to execute on failure.</param>
+    /// <returns>The current <see cref="StackResult{T, TError}"/> instance.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the action is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public StackResult<T, TError> OnFailure(Action<TError> action)
+    {
+        if (!_isSuccess)
+        {
+            Debug.Assert(action is not null, "Action should not be null.");
+            Debug.Assert(_error is not null, "Error should not be null when executing action on failure.");
+
+            action(_error);
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Matches the result, executing the appropriate function based on whether it is a success or failure.
+    /// If the result is successful, it executes the <paramref name="onSuccess"/> function with the successful value.
+    /// If the result is a failure, it executes the <paramref name="onFailure"/> function with the error.
+    /// </summary>
+    /// <typeparam name="TResult">The type of the result returned by the matching functions.</typeparam>
+    /// <param name="onSuccess">The function to execute if the result is successful.</param>
+    /// <param name="onFailure">The function to execute if the result is a failure.</param>
+    /// <returns>The result of the executed function based on the result state.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when either <paramref name="onSuccess"/> or <paramref name="onFailure"/> is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public TResult Match<TResult>(Func<T, TResult> onSuccess, Func<TError, TResult> onFailure)
+    {
+        if (_isSuccess)
+        {
+            Debug.Assert(onSuccess is not null, "OnSuccess function should not be null.");
+            Debug.Assert(_value is not null, "Value should not be null when matching a success.");
+
+            return onSuccess(_value);
+        }
+
+        Debug.Assert(onFailure is not null, "OnFailure function should not be null.");
+        Debug.Assert(_error is not null, "Error should not be null when matching a failure.");
+
+        return onFailure(_error);
+    }
+
+    /// <summary>
+    /// Executes the appropriate action based on whether the result is a success or failure.
+    /// If the result is successful, it executes the <paramref name="onSuccess"/> action with the successful value.
+    /// If the result is a failure, it executes the <paramref name="onFailure"/> action with the error.
+    /// </summary>
+    /// <param name="onSuccess">The action to execute if the result is successful.</param>
+    /// <param name="onFailure">The action to execute if the result is a failure.</param>
+    /// <exception cref="ArgumentNullException">Thrown when either <paramref name="onSuccess"/> or <paramref name="onFailure"/> is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Match(Action<T> onSuccess, Action<TError> onFailure)
+    {
+        if (_isSuccess)
+        {
+            Debug.Assert(onSuccess is not null, "OnSuccess action should not be null.");
+            Debug.Assert(_value is not null, "Value should not be null when executing action on success.");
+
+            onSuccess(_value);
+        }
+        else
+        {
+            Debug.Assert(onFailure is not null, "OnFailure action should not be null.");
+            Debug.Assert(_error is not null, "Error should not be null when executing action on failure.");
+
+            onFailure(_error);
+        }
+    }
+}

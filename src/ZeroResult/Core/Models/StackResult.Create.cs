@@ -7,10 +7,6 @@ namespace ZeroResult.Core.Models;
 /// Provides factory methods for creating <see cref="StackResult{T, TError}"/> instances.
 /// Designed for zero-allocation result creation in high-performance scenarios.
 /// </summary>
-/// <remarks>
-/// All methods are aggressively inlined and use pass-by-reference semantics (<see langword="in"/>) 
-/// to minimize copying of value types.
-/// </remarks>
 public static partial class StackResult
 {
     /// <summary>

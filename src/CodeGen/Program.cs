@@ -69,7 +69,7 @@ static void GenerateHeapResult(string outputRoot, string version)
         TargetFramework = "net8.0+"
     };
 
-    Generate<OperationsGenerator>("ResultOperations", outputRoot, model);
+    Generate<OperationsGenerator>("Operations", outputRoot, model);
     Generate<AccessorsGenerator>("Accessors", outputRoot, model);
     Generate<DataGenerator>("Data", outputRoot, model);
     Generate<ResultCreateGenerator>("HeapResult.Create", outputRoot, model);

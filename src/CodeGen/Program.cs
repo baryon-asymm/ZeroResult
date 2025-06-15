@@ -55,6 +55,7 @@ static void GenerateStackResult(string outputRoot, string version)
     var outputPath = Path.Combine(outputRoot, "Models");
 
     Generate<AccessorsGenerator>("Accessors", outputPath, model);
+    Generate<ConversionsGenerator>("Conversions", outputPath, model);
     Generate<DataGenerator>("Data", outputPath, model);
     Generate<CreateOperationsGenerator>("StackResult.Create", outputPath, model);
 
@@ -78,6 +79,7 @@ static void GenerateHeapResult(string outputRoot, string version)
     var outputPath = Path.Combine(outputRoot, "Models");
 
     Generate<AccessorsGenerator>("Accessors", outputPath, model);
+    Generate<ConversionsGenerator>("Conversions", outputPath, model);
     Generate<DataGenerator>("Data", outputPath, model);
     Generate<CreateOperationsGenerator>("HeapResult.Create", outputPath, model);
 

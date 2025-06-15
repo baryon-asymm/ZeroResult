@@ -1,9 +1,6 @@
-using ZeroResult.Core.Errors;
-using ZeroResult.Core.Models;
+namespace ZeroResult.Tests;
 
-namespace ZeroResult.Tests.Core.Models;
-
-public class StackResultTests
+public class HeapResultTests
 {
     private readonly BasicError _testError = new("TestError");
     private readonly BasicError _ensureError = new("EnsureError");
@@ -11,7 +8,7 @@ public class StackResultTests
     [Fact]
     public void SuccessResult_HasCorrectProperties()
     {
-        var result = StackResult.Success<int, BasicError>(42);
+        var result = HeapResult.Success<int, BasicError>(42);
 
         Assert.True(result.IsSuccess);
         Assert.False(result.IsFailure);
@@ -21,7 +18,7 @@ public class StackResultTests
     [Fact]
     public void FailureResult_HasCorrectProperties()
     {
-        var result = StackResult.Failure<int, BasicError>(_testError);
+        var result = HeapResult.Failure<int, BasicError>(_testError);
 
         Assert.False(result.IsSuccess);
         Assert.True(result.IsFailure);
@@ -33,7 +30,7 @@ public class StackResultTests
     {
         static void Act()
         {
-            var result = StackResult.Failure<int, BasicError>(new BasicError("Test"));
+            var result = HeapResult.Failure<int, BasicError>(new BasicError("Test"));
             _ = result.Value;
         }
 
@@ -46,7 +43,7 @@ public class StackResultTests
     {
         static void Act()
         {
-            var result = StackResult.Success<int, BasicError>(42);
+            var result = HeapResult.Success<int, BasicError>(42);
             _ = result.Error;
         }
 
@@ -57,7 +54,7 @@ public class StackResultTests
     [Fact]
     public void Map_OnSuccess_TransformsValue()
     {
-        var result = StackResult.Success<int, BasicError>(42);
+        var result = HeapResult.Success<int, BasicError>(42);
         var mapped = result.Map(x => x.ToString());
 
         Assert.True(mapped.IsSuccess);
@@ -67,7 +64,7 @@ public class StackResultTests
     [Fact]
     public void Map_OnFailure_ReturnsOriginalError()
     {
-        var result = StackResult.Failure<int, BasicError>(_testError);
+        var result = HeapResult.Failure<int, BasicError>(_testError);
         var mapped = result.Map(x => x.ToString());
 
         Assert.False(mapped.IsSuccess);
@@ -75,15 +72,13 @@ public class StackResultTests
     }
 
 #if RELEASE
-    
-    // In release mode, we expect a NullReferenceException if the mapper is null.
-    // Skip this test in debug mode to avoid DebugAssertException.
+
     [Fact]
     public void Map_WithNullMapper_Throws()
     {
         static void Act()
         {
-            var result = StackResult.Success<int, BasicError>(42);
+            var result = HeapResult.Success<int, BasicError>(42);
             result.Map<int>(null!);
         }
         
@@ -92,17 +87,15 @@ public class StackResultTests
 
 #endif
 
-#if NET9_0_OR_GREATER
-
     [Fact]
     public void Bind_OnSuccess_TransformsToNewResult()
     {
-        static StackResult<string, BasicError> BindFunc(int value)
+        static HeapResult<string, BasicError> BindFunc(int value)
         {
-            return StackResult.Success<string, BasicError>(value.ToString());
+            return HeapResult.Success<string, BasicError>(value.ToString());
         }
 
-        var result = StackResult.Success<int, BasicError>(42);
+        var result = HeapResult.Success<int, BasicError>(42);
         var bound = result.Bind(BindFunc);
         
         Assert.True(bound.IsSuccess);
@@ -112,8 +105,8 @@ public class StackResultTests
     [Fact]
     public void Bind_OnFailure_ReturnsOriginalError()
     {
-        var result = StackResult.Failure<int, BasicError>(_testError);
-        var bound = result.Bind(x => StackResult.Success<string, BasicError>(x.ToString()));
+        var result = HeapResult.Failure<int, BasicError>(_testError);
+        var bound = result.Bind(x => HeapResult.Success<string, BasicError>(x.ToString()));
         
         Assert.False(bound.IsSuccess);
         Assert.Equal(_testError, bound.Error);
@@ -121,14 +114,12 @@ public class StackResultTests
     
 #if RELEASE
 
-    // In release mode, we expect a NullReferenceException if the binder is null.
-    // Skip this test in debug mode to avoid DebugAssertException.
     [Fact]
     public void Bind_WithNullBinder_Throws()
     {
         static void Act()
         {
-            var result = StackResult.Success<int, BasicError>(42);
+            var result = HeapResult.Success<int, BasicError>(42);
             result.Bind<int>(null!);
         }
 
@@ -137,12 +128,10 @@ public class StackResultTests
 
 #endif
 
-#endif
-
     [Fact]
     public void Ensure_OnSuccessWithValidPredicate_ReturnsOriginal()
     {
-        var result = StackResult.Success<int, BasicError>(42)
+        var result = HeapResult.Success<int, BasicError>(42)
             .Ensure(x => x > 0, () => _ensureError);
 
         Assert.True(result.IsSuccess);
@@ -152,7 +141,7 @@ public class StackResultTests
     [Fact]
     public void Ensure_OnSuccessWithInvalidPredicate_ReturnsError()
     {
-        var result = StackResult.Success<int, BasicError>(42)
+        var result = HeapResult.Success<int, BasicError>(42)
             .Ensure(x => x < 0, () => _ensureError);
 
         Assert.False(result.IsSuccess);
@@ -162,7 +151,7 @@ public class StackResultTests
     [Fact]
     public void Ensure_OnFailure_ReturnsOriginalError()
     {
-        var result = StackResult.Failure<int, BasicError>(_testError)
+        var result = HeapResult.Failure<int, BasicError>(_testError)
             .Ensure(x => x > 0, () => _ensureError);
 
         Assert.False(result.IsSuccess);
@@ -173,7 +162,7 @@ public class StackResultTests
     public void OnSuccess_ExecutesAction_WhenSuccess()
     {
         bool executed = false;
-        var result = StackResult.Success<int, BasicError>(42)
+        var result = HeapResult.Success<int, BasicError>(42)
             .OnSuccess(x => executed = true);
 
         Assert.True(executed);
@@ -183,7 +172,7 @@ public class StackResultTests
     public void OnSuccess_DoesNotExecuteAction_WhenFailure()
     {
         bool executed = false;
-        var result = StackResult.Failure<int, BasicError>(_testError)
+        var result = HeapResult.Failure<int, BasicError>(_testError)
             .OnSuccess(x => executed = true);
 
         Assert.False(executed);
@@ -193,7 +182,7 @@ public class StackResultTests
     public void OnFailure_ExecutesAction_WhenFailure()
     {
         bool executed = false;
-        var result = StackResult.Failure<int, BasicError>(_testError)
+        var result = HeapResult.Failure<int, BasicError>(_testError)
             .OnFailure(x => executed = true);
 
         Assert.True(executed);
@@ -203,7 +192,7 @@ public class StackResultTests
     public void OnFailure_DoesNotExecuteAction_WhenSuccess()
     {
         bool executed = false;
-        var result = StackResult.Success<int, BasicError>(42)
+        var result = HeapResult.Success<int, BasicError>(42)
             .OnFailure(x => executed = true);
 
         Assert.False(executed);
@@ -212,7 +201,7 @@ public class StackResultTests
     [Fact]
     public void Match_OnSuccess_ExecutesSuccessBranch()
     {
-        var result = StackResult.Success<int, BasicError>(42);
+        var result = HeapResult.Success<int, BasicError>(42);
         var output = result.Match(
             onSuccess: x => x.ToString(),
             onFailure: _ => "error");
@@ -223,7 +212,7 @@ public class StackResultTests
     [Fact]
     public void Match_OnFailure_ExecutesFailureBranch()
     {
-        var result = StackResult.Failure<int, BasicError>(_testError);
+        var result = HeapResult.Failure<int, BasicError>(_testError);
         var output = result.Match(
             onSuccess: _ => "success",
             onFailure: e => e.Message);
@@ -237,7 +226,7 @@ public class StackResultTests
         bool successExecuted = false;
         bool failureExecuted = false;
 
-        var result = StackResult.Success<int, BasicError>(42);
+        var result = HeapResult.Success<int, BasicError>(42);
         result.Match(
             onSuccess: _ => successExecuted = true,
             onFailure: _ => failureExecuted = true);
@@ -252,7 +241,7 @@ public class StackResultTests
         bool successExecuted = false;
         bool failureExecuted = false;
 
-        var result = StackResult.Failure<int, BasicError>(_testError);
+        var result = HeapResult.Failure<int, BasicError>(_testError);
         result.Match(
             onSuccess: _ => successExecuted = true,
             onFailure: _ => failureExecuted = true);
@@ -260,11 +249,40 @@ public class StackResultTests
         Assert.False(successExecuted);
         Assert.True(failureExecuted);
     }
-}
 
-public class BasicError(string message) : IError
-{
-    public string Message { get; } = message;
+    [Fact]
+    public void Equality_ComparesCorrectly()
+    {
+        var success1 = HeapResult.Success<int, BasicError>(42);
+        var success2 = HeapResult.Success<int, BasicError>(42);
+        var successDifferent = HeapResult.Success<int, BasicError>(100);
+        var failure1 = HeapResult.Failure<int, BasicError>(_testError);
+        var failure2 = HeapResult.Failure<int, BasicError>(_testError);
+        var failureDifferent = HeapResult.Failure<int, BasicError>(_ensureError);
 
-    public string? Code => throw new NotImplementedException();
+        // Equal successes
+        Assert.True(success1 == success2);
+        Assert.False(success1 != success2);
+        Assert.True(success1.Equals(success2));
+
+        // Different successes
+        Assert.False(success1 == successDifferent);
+        Assert.True(success1 != successDifferent);
+        Assert.False(success1.Equals(successDifferent));
+
+        // Equal failures
+        Assert.True(failure1 == failure2);
+        Assert.False(failure1 != failure2);
+        Assert.True(failure1.Equals(failure2));
+
+        // Different failures
+        Assert.False(failure1 == failureDifferent);
+        Assert.True(failure1 != failureDifferent);
+        Assert.False(failure1.Equals(failureDifferent));
+
+        // Success vs failure
+        Assert.False(success1 == failure1);
+        Assert.True(success1 != failure1);
+        Assert.False(success1.Equals(failure1));
+    }
 }

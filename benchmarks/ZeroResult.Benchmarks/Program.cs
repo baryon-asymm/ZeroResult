@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Running;
 using ZeroResult.Benchmarks;
 
-BenchmarkRunner.Run<ResultBenchmarks>();
+BenchmarkRunner.Run<MonadBenchmarks>();
 BenchmarkRunner.Run<MapBindBenchmarks>();
+BenchmarkRunner.Run<AsyncMonadBenchmarks>();

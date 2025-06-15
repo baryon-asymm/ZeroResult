@@ -1,4 +1,4 @@
-namespace ZeroResult.Core.Errors;
+namespace ZeroResult.Errors;
 
 /// <summary>
 /// Represents an error type for Result monads.

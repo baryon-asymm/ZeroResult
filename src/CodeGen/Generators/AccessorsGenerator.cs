@@ -1,26 +1,6 @@
-using System.Text;
-using CodeGen.Helpers;
-
 namespace CodeGen.Generators;
 
-public class AccessorsGenerator : ICodeGenerator
+public class AccessorsGenerator : BaseGenerator
 {
-    public const string TemplateName = "Accessors.template.cs";
-
-    public string Generate(dynamic model)
-    {
-        var template = TemplateManager.GetTemplate(TemplateName);
-
-        var builder = new StringBuilder(template)
-            .Replace("{{Modifier}}", model.Modifier)
-            .Replace("{{ResultType}}", model.ResultType)
-            .Replace("{{GENERATOR_VERSION}}", model.Version)
-            .Replace("{{GENERATOR_VERSION}}", model.Version)
-            .Replace("{{GENERATED_AT}}", model.GeneratedAt)
-            .Replace("{{TEMPLATE_NAME}}", TemplateName)
-            .Replace("{{RESULT_TYPE}}", model.ResultType)
-            .Replace("{{TARGET_FRAMEWORK}}", model.TargetFramework);
-
-        return builder.ToString();
-    }
+    public override string TemplateName => "Accessors.template.cs";
 }

@@ -14,9 +14,9 @@
 #nullable enable
 
 using System.Runtime.CompilerServices;
-using ZeroResult.Core.Errors;
+using ZeroResult.Errors;
 
-namespace ZeroResult.Core.Models;
+namespace ZeroResult;
 
 public {{Modifier}} partial struct {{ResultType}}<T, TError>
     where TError : IError

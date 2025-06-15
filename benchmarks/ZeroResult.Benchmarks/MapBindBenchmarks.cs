@@ -1,6 +1,5 @@
 using BenchmarkDotNet.Attributes;
-using ZeroResult.Core.Errors;
-using ZeroResult.Core.Models;
+using ZeroResult.Errors;
 
 namespace ZeroResult.Benchmarks;
 
@@ -10,7 +9,7 @@ public class MapBindBenchmarks
 {
     private readonly Random _random = new(42);
     
-    [Params(0, 25, 50, 75, 100)]
+    [Params(0, 50, 100)]
     public int SuccessThreshold { get; set; }
 
     [Params(100, 1000)]

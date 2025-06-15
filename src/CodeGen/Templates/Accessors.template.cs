@@ -13,10 +13,10 @@
 
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using ZeroResult.Core.Errors;
-using ZeroResult.Core.Helpers;
+using ZeroResult.Errors;
+using ZeroResult.Helpers;
 
-namespace ZeroResult.Core.Models;
+namespace ZeroResult;
 
 public {{Modifier}} partial struct {{ResultType}}<T, TError>
     where TError : IError

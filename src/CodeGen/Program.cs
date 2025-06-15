@@ -7,7 +7,7 @@ using CodeGen.Generators;
 try
 {
     var repoRoot = FindRepositoryRoot();
-    var outputRoot = Path.Combine(repoRoot.FullName, "src/ZeroResult/Core/Models");
+    var outputRoot = Path.Combine(repoRoot.FullName, "src/ZeroResult");
     var version = GetVersion();
 
     Console.WriteLine($"Repository root: {repoRoot}");
@@ -48,31 +48,44 @@ static void GenerateStackResult(string outputRoot, string version)
         ResultType = "StackResult",
         IsStackResult = true,
         Version = version,
-        GeneratedAt = DateTime.UtcNow.ToString("O"),
+        GeneratedAt = DateTime.UtcNow.ToString(),
         TargetFramework = "net8.0+"
     };
 
-    Generate<OperationsGenerator>("Operations", outputRoot, model);
-    Generate<AccessorsGenerator>("Accessors", outputRoot, model);
-    Generate<DataGenerator>("Data", outputRoot, model);
-    Generate<ResultCreateGenerator>("StackResult.Create", outputRoot, model);
+    var outputPath = Path.Combine(outputRoot, "Models");
+
+    Generate<AccessorsGenerator>("Accessors", outputPath, model);
+    Generate<DataGenerator>("Data", outputPath, model);
+    Generate<CreateOperationsGenerator>("StackResult.Create", outputPath, model);
+
+    outputPath = Path.Combine(outputRoot, "Functional");
+
+    Generate<OperationsGenerator>("Operations", outputPath, model);
 }
 
 static void GenerateHeapResult(string outputRoot, string version)
 {
-    var model = new {
+    var model = new
+    {
         Modifier = "readonly",
         ResultType = "HeapResult",
         IsStackResult = false,
         Version = version,
-        GeneratedAt = DateTime.UtcNow.ToString("O"),
+        GeneratedAt = DateTime.UtcNow.ToString(),
         TargetFramework = "net8.0+"
     };
 
-    Generate<OperationsGenerator>("Operations", outputRoot, model);
-    Generate<AccessorsGenerator>("Accessors", outputRoot, model);
-    Generate<DataGenerator>("Data", outputRoot, model);
-    Generate<ResultCreateGenerator>("HeapResult.Create", outputRoot, model);
+    var outputPath = Path.Combine(outputRoot, "Models");
+
+    Generate<AccessorsGenerator>("Accessors", outputPath, model);
+    Generate<DataGenerator>("Data", outputPath, model);
+    Generate<CreateOperationsGenerator>("HeapResult.Create", outputPath, model);
+
+    outputPath = Path.Combine(outputRoot, "Functional");
+    
+    Generate<OperationsGenerator>("Operations", outputPath, model);
+    Generate<AsyncOperationsGenerator>("AsyncOperations", outputPath, model);
+    Generate<AsyncExtensionsGenerator>("AsyncOperations.Extensions", outputPath, model);
 }
 
 static void Generate<T>(string component, string outputRoot, dynamic model) 

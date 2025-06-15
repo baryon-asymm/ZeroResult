@@ -1,7 +1,7 @@
 using System.Diagnostics;
-using ZeroResult.Core.Errors;
+using ZeroResult.Errors;
 
-namespace ZeroResult.Core.Models;
+namespace ZeroResult;
 
 /// <summary>
 /// A heap-allocated Result monad for high-performance scenarios that represents either

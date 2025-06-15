@@ -1,15 +1,14 @@
 using BenchmarkDotNet.Attributes;
-using ZeroResult.Core.Models;
 
 namespace ZeroResult.Benchmarks;
 
 [MemoryDiagnoser]
 [ShortRunJob]
-public class ResultBenchmarks
+public class MonadBenchmarks
 {
     private readonly Random _random = new(42);
 
-    [Params(0, 25, 50, 75, 100)]
+    [Params(0, 50, 100)]
     public int SuccessThreshold { get; set; }
 
     [Params(100, 1000)]
@@ -35,12 +34,12 @@ public class ResultBenchmarks
     }
 
     [Benchmark]
-    public int ResultMonadApproach()
+    public int StackResultMonadApproach()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            var result = ResultMethod(_random.Next(100));
+            var result = StackResultMethod(_random.Next(100));
             sum += result.Match(
                 onSuccess: x => x,
                 onFailure: _ => -1);
@@ -50,12 +49,12 @@ public class ResultBenchmarks
     }
 
     [Benchmark]
-    public int ResultMonadApproach_NoAllocations()
+    public int HeapResultMonadApproach()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            var result = StackResultMethod(_random.Next(100));
+            var result = HeapResultMethod(_random.Next(100));
             sum += result.Match(
                 onSuccess: x => x,
                 onFailure: _ => -1);
@@ -74,16 +73,6 @@ public class ResultBenchmarks
         throw new InvalidOperationException("Failed");
     }
 
-    private HeapResult<int, BasicError> ResultMethod(int input)
-    {
-        if (input > SuccessThreshold)
-        {
-            return HeapResult.Success<int, BasicError>(input);
-        }
-
-        return HeapResult.Failure<int, BasicError>(new BasicError("Failed"));
-    }
-
     private StackResult<int, BasicError> StackResultMethod(int input)
     {
         if (input <= SuccessThreshold)
@@ -92,5 +81,15 @@ public class ResultBenchmarks
         }
 
         return StackResult.Failure<int, BasicError>(new BasicError("Failed"));
+    }
+
+    private HeapResult<int, BasicError> HeapResultMethod(int input)
+    {
+        if (input <= SuccessThreshold)
+        {
+            return HeapResult.Success<int, BasicError>(input);
+        }
+
+        return HeapResult.Failure<int, BasicError>(new BasicError("Failed"));
     }
 }

@@ -3,11 +3,11 @@ using CodeGen.Helpers;
 
 namespace CodeGen.Generators;
 
-public class ResultCreateGenerator : ICodeGenerator
+public abstract class BaseGenerator : ICodeGenerator
 {
-    public const string TemplateName = "ResultCreate.template.cs";
+    public abstract string TemplateName { get; }
 
-    public string Generate(dynamic model)
+    public virtual string Generate(dynamic model)
     {
         var template = TemplateManager.GetTemplate(TemplateName);
 
@@ -20,6 +20,17 @@ public class ResultCreateGenerator : ICodeGenerator
             .Replace("{{TEMPLATE_NAME}}", TemplateName)
             .Replace("{{RESULT_TYPE}}", model.ResultType)
             .Replace("{{TARGET_FRAMEWORK}}", model.TargetFramework);
+
+        if (model.IsStackResult)
+        {
+            builder.Replace("{{#if NET9_0_OR_GREATER}}", "\n" + "#if NET9_0_OR_GREATER" + "\n")
+                   .Replace("{{#endif}}", "\n" + "#endif" + "\n");
+        }
+        else
+        {
+            builder.Replace("{{#if NET9_0_OR_GREATER}}", "")
+                   .Replace("{{#endif}}", "");
+        }
 
         return builder.ToString();
     }

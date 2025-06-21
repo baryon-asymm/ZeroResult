@@ -1,28 +1,21 @@
 using BenchmarkDotNet.Attributes;
+using ZeroResult.Benchmarks.Common;
 
 namespace ZeroResult.Benchmarks;
 
 [MemoryDiagnoser]
 [ShortRunJob]
-public class MonadBenchmarks
+public class MonadBenchmarks : BenchmarkBase
 {
-    private readonly Random _random = new(42);
-
-    [Params(0, 50, 100)]
-    public int SuccessThreshold { get; set; }
-
-    [Params(100, 1000)]
-    public int Iterations { get; set; }
-
     [Benchmark(Baseline = true)]
-    public int TraditionalApproach()
+    public int ExceptionHandling()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
             try
             {
-                sum += TraditionalMethod(_random.Next(100));
+                sum += TraditionalMethod(Random.Next(100));
             }
             catch (InvalidOperationException)
             {
@@ -34,12 +27,12 @@ public class MonadBenchmarks
     }
 
     [Benchmark]
-    public int StackResultMonadApproach()
+    public int StackResultMonad()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            var result = StackResultMethod(_random.Next(100));
+            var result = StackResultMethod(Random.Next(100));
             sum += result.Match(
                 onSuccess: x => x,
                 onFailure: _ => -1);
@@ -49,12 +42,12 @@ public class MonadBenchmarks
     }
 
     [Benchmark]
-    public int HeapResultMonadApproach()
+    public int HeapResultMonad()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            var result = HeapResultMethod(_random.Next(100));
+            var result = HeapResultMethod(Random.Next(100));
             sum += result.Match(
                 onSuccess: x => x,
                 onFailure: _ => -1);
@@ -63,33 +56,57 @@ public class MonadBenchmarks
         return sum;
     }
 
-    private int TraditionalMethod(int input)
+    [Benchmark]
+    public int StackResult_ExceptionToMonad()
     {
-        if (input <= SuccessThreshold)
+        int sum = 0;
+        for (int i = 0; i < Iterations; i++)
         {
-            return input;
+            var result = CallExternalLib_WithStackResult(Random.Next(100));
+            sum += result.Match(
+                onSuccess: x => x,
+                onFailure: _ => -1);
         }
 
-        throw new InvalidOperationException("Failed");
+        return sum;
     }
 
-    private StackResult<int, BasicError> StackResultMethod(int input)
+    [Benchmark]
+    public int HeapResult_ExceptionToMonad()
     {
-        if (input <= SuccessThreshold)
+        int sum = 0;
+        for (int i = 0; i < Iterations; i++)
         {
-            return StackResult.Success<int, BasicError>(input);
+            var result = CallExternalLib_WithHeapResult(Random.Next(100));
+            sum += result.Match(
+                onSuccess: x => x,
+                onFailure: _ => -1);
         }
 
-        return StackResult.Failure<int, BasicError>(new BasicError("Failed"));
+        return sum;
     }
 
-    private HeapResult<int, BasicError> HeapResultMethod(int input)
+    private StackResult<int, BasicError> CallExternalLib_WithStackResult(int input)
     {
-        if (input <= SuccessThreshold)
+        try
         {
-            return HeapResult.Success<int, BasicError>(input);
+            return ExternalLibraryMethod(input);
         }
+        catch (Exception ex)
+        {
+            return new BasicError(ex.Message);
+        }
+    }
 
-        return HeapResult.Failure<int, BasicError>(new BasicError("Failed"));
+    private HeapResult<int, BasicError> CallExternalLib_WithHeapResult(int input)
+    {
+        try
+        {
+            return ExternalLibraryMethod(input);
+        }
+        catch (Exception ex)
+        {
+            return new BasicError(ex.Message);
+        }
     }
 }

@@ -1,73 +1,55 @@
 using BenchmarkDotNet.Attributes;
+using ZeroResult.Benchmarks.Common;
 
 namespace ZeroResult.Benchmarks;
 
 [MemoryDiagnoser]
 [ShortRunJob]
-public class AsyncMonadBenchmarks
+public class AsyncMonadBenchmarks : BenchmarkBase
 {
-    private readonly Random _random = new(42);
-    private const int AsyncDelayMs = 10;
-
-    [Params(0, 50, 100)]
-    public int SuccessThreshold { get; set; }
-
-    [Params(100)]
-    public int Iterations { get; set; }
-
     [Benchmark(Baseline = true)]
-    public async Task<int> TraditionalAsyncApproach()
+    public async Task<int> ExceptionHandlingAsync()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
             try
             {
-                sum += await TraditionalAsyncMethod(_random.Next(100));
+                sum += await TraditionalAsyncMethod(Random.Next(100));
             }
             catch (InvalidOperationException)
             {
                 sum -= 1;
             }
         }
+
         return sum;
     }
 
     [Benchmark]
-    public async ValueTask<int> HeapResultAsyncApproach()
+    public async ValueTask<int> HeapResultAsync()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            var result = await HeapResultAsyncMethod(_random.Next(100));
+            var result = await HeapResultAsyncMethod(Random.Next(100));
             sum += await result.MatchAsync(
                 onSuccess: x => ValueTask.FromResult(x),
                 onFailure: _ => ValueTask.FromResult(-1));
         }
+        
         return sum;
     }
 
     private async Task<int> TraditionalAsyncMethod(int input)
     {
-        await Task.Delay(AsyncDelayMs);
-
-        if (input <= SuccessThreshold)
-        {
-            return input;
-        }
-
-        throw new InvalidOperationException("Failed");
+        await Task.Delay(BenchmarkConstants.AsyncDelayMs);
+        return TraditionalMethod(input);
     }
 
     private async ValueTask<HeapResult<int, BasicError>> HeapResultAsyncMethod(int input)
     {
-        await Task.Delay(AsyncDelayMs);
-
-        if (input <= SuccessThreshold)
-        {
-            return HeapResult.Success<int, BasicError>(input);
-        }
-
-        return HeapResult.Failure<int, BasicError>(new BasicError("Failed"));
+        await Task.Delay(BenchmarkConstants.AsyncDelayMs);
+        return HeapResultMethod(input);
     }
 }

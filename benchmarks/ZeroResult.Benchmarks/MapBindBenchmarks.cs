@@ -1,29 +1,21 @@
 using BenchmarkDotNet.Attributes;
-using ZeroResult.Errors;
+using ZeroResult.Benchmarks.Common;
 
 namespace ZeroResult.Benchmarks;
 
 [MemoryDiagnoser]
 [ShortRunJob]
-public class MapBindBenchmarks
+public class MapBindBenchmarks : BenchmarkBase
 {
-    private readonly Random _random = new(42);
-    
-    [Params(0, 50, 100)]
-    public int SuccessThreshold { get; set; }
-
-    [Params(100, 1000)]
-    public int Iterations { get; set; }
-
     [Benchmark(Baseline = true)]
-    public int TraditionalChaining()
+    public int ExceptionHandlingChaining()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
             try
             {
-                var value = TraditionalMethod(_random.Next(100));
+                var value = TraditionalMethod(Random.Next(100));
                 var transformed = TraditionalTransform(value);
                 sum += transformed;
             }
@@ -37,36 +29,15 @@ public class MapBindBenchmarks
     }
 
     [Benchmark]
-    public int StackResultTraditionalStyle()
+    public int StackResult_ImperativeStyle()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            var result = StackResultTraditionalMethod(_random.Next(100));
+            var result = StackResultMethod(Random.Next(100));
             if (result.IsSuccess)
             {
-                var transformed = StackResultTraditionalTransform(result.Value);
-                sum += transformed.IsSuccess ? transformed.Value : -1;
-            }
-            else
-            {
-                sum -= 1;
-            }
-        }
-        
-        return sum;
-    }
-
-    [Benchmark]
-    public int HeapResultTraditionalStyle()
-    {
-        int sum = 0;
-        for (int i = 0; i < Iterations; i++)
-        {
-            var result = HeapResultTraditionalMethod(_random.Next(100));
-            if (result.IsSuccess)
-            {
-                var transformed = HeapResultTraditionalTransform(result.Value);
+                var transformed = StackResultTransform(result.Value);
                 sum += transformed.IsSuccess ? transformed.Value : -1;
             }
             else
@@ -79,15 +50,76 @@ public class MapBindBenchmarks
     }
 
     [Benchmark]
-    public int StackResultBindChaining()
+    public int StackResult_ImperativeStyle_ExceptionToMonad()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            sum += StackResultMethod(_random.Next(100))
-                .Bind(x => x <= SuccessThreshold
-                    ? StackResult.Success<int, BasicError>(x + 10)
-                    : StackResult.Failure<int, BasicError>(new BasicError("Too small")))
+            var result = CallExternalLib_WithStackResult(Random.Next(100));
+            if (result.IsSuccess)
+            {
+                var transformed = StackResultTransform(result.Value);
+                sum += transformed.IsSuccess ? transformed.Value : -1;
+            }
+            else
+            {
+                sum -= 1;
+            }
+        }
+
+        return sum;
+    }
+
+    [Benchmark]
+    public int HeapResult_ImperativeStyle()
+    {
+        int sum = 0;
+        for (int i = 0; i < Iterations; i++)
+        {
+            var result = HeapResultMethod(Random.Next(100));
+            if (result.IsSuccess)
+            {
+                var transformed = HeapResultTransform(result.Value);
+                sum += transformed.IsSuccess ? transformed.Value : -1;
+            }
+            else
+            {
+                sum -= 1;
+            }
+        }
+
+        return sum;
+    }
+
+    [Benchmark]
+    public int HeapResult_ImperativeStyle_ExceptionToMonad()
+    {
+        int sum = 0;
+        for (int i = 0; i < Iterations; i++)
+        {
+            var result = CallExternalLib_WithHeapResult(Random.Next(100));
+            if (result.IsSuccess)
+            {
+                var transformed = HeapResultTransform(result.Value);
+                sum += transformed.IsSuccess ? transformed.Value : -1;
+            }
+            else
+            {
+                sum -= 1;
+            }
+        }
+
+        return sum;
+    }
+
+    [Benchmark]
+    public int StackResult_Bind()
+    {
+        int sum = 0;
+        for (int i = 0; i < Iterations; i++)
+        {
+            sum += StackResultMethod(Random.Next(100))
+                .Bind(StackTransformValue)
                 .Match(
                     onSuccess: x => x,
                     onFailure: _ => -1);
@@ -97,15 +129,13 @@ public class MapBindBenchmarks
     }
 
     [Benchmark]
-    public int HeapResultBindChaining()
+    public int StackResult_Bind_ExceptionToMonad()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            sum += HeapResultMethod(_random.Next(100))
-                .Bind(x => x <= SuccessThreshold
-                    ? HeapResult.Success<int, BasicError>(x + 10)
-                    : HeapResult.Failure<int, BasicError>(new BasicError("Too small")))
+            sum += CallExternalLib_WithStackResult(Random.Next(100))
+                .Bind(StackTransformValue)
                 .Match(
                     onSuccess: x => x,
                     onFailure: _ => -1);
@@ -115,13 +145,13 @@ public class MapBindBenchmarks
     }
 
     [Benchmark]
-    public int StackResultMapChaining()
+    public int HeapResult_Bind()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            sum += StackResultMethod(_random.Next(100))
-                .Map(x => x <= SuccessThreshold ? x + 10 : -1)
+            sum += HeapResultMethod(Random.Next(100))
+                .Bind(HeapTransformValue)
                 .Match(
                     onSuccess: x => x,
                     onFailure: _ => -1);
@@ -131,13 +161,13 @@ public class MapBindBenchmarks
     }
 
     [Benchmark]
-    public int HeapResultMapChaining()
+    public int HeapResult_Bind_ExceptionToMonad()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            sum += HeapResultMethod(_random.Next(100))
-                .Map(x => x <= SuccessThreshold ? x + 10 : -1)
+            sum += CallExternalLib_WithHeapResult(Random.Next(100))
+                .Bind(HeapTransformValue)
                 .Match(
                     onSuccess: x => x,
                     onFailure: _ => -1);
@@ -146,90 +176,128 @@ public class MapBindBenchmarks
         return sum;
     }
 
-    private StackResult<int, BasicError> StackResultTraditionalMethod(int input)
+    [Benchmark]
+    public int StackResult_Map()
     {
-        if (input <= SuccessThreshold)
+        int sum = 0;
+        for (int i = 0; i < Iterations; i++)
         {
-            return StackResult.Success<int, BasicError>(input);
+            sum += StackResultMethod(Random.Next(100))
+                .Map(TransformDirectly)
+                .Match(
+                    onSuccess: x => x,
+                    onFailure: _ => -1);
         }
 
-        return StackResult.Failure<int, BasicError>(new BasicError("Failed"));
+        return sum;
     }
 
-    private StackResult<int, BasicError> StackResultTraditionalTransform(int input)
+    [Benchmark]
+    public int StackResult_Map_ExceptionToMonad()
     {
-        if (input <= SuccessThreshold)
+        int sum = 0;
+        for (int i = 0; i < Iterations; i++)
         {
-            return StackResult.Success<int, BasicError>(input + 10);
+            sum += CallExternalLib_WithStackResult(Random.Next(100))
+                .Map(TransformDirectly)
+                .Match(
+                    onSuccess: x => x,
+                    onFailure: _ => -1);
         }
 
-        return StackResult.Failure<int, BasicError>(new BasicError("Too small"));
+        return sum;
     }
 
-    private HeapResult<int, BasicError> HeapResultTraditionalMethod(int input)
+    [Benchmark]
+    public int HeapResult_Map()
     {
-        if (input <= SuccessThreshold)
+        int sum = 0;
+        for (int i = 0; i < Iterations; i++)
         {
-            return HeapResult.Success<int, BasicError>(input);
+            sum += HeapResultMethod(Random.Next(100))
+                .Map(TransformDirectly)
+                .Match(
+                    onSuccess: x => x,
+                    onFailure: _ => -1);
         }
 
-        return HeapResult.Failure<int, BasicError>(new BasicError("Failed"));
+        return sum;
     }
 
-    private HeapResult<int, BasicError> HeapResultTraditionalTransform(int input)
+    [Benchmark]
+    public int HeapResult_Map_ExceptionToMonad()
     {
-        if (input <= SuccessThreshold)
+        int sum = 0;
+        for (int i = 0; i < Iterations; i++)
         {
-            return HeapResult.Success<int, BasicError>(input + 10);
+            sum += CallExternalLib_WithHeapResult(Random.Next(100))
+                .Map(TransformDirectly)
+                .Match(
+                    onSuccess: x => x,
+                    onFailure: _ => -1);
         }
 
-        return HeapResult.Failure<int, BasicError>(new BasicError("Too small"));
-    }
-
-    private int TraditionalMethod(int input)
-    {
-        if (input <= SuccessThreshold)
-        {
-            return input;
-        }
-
-        throw new InvalidOperationException("Failed");
+        return sum;
     }
 
     private int TraditionalTransform(int input)
     {
-        if (input <= SuccessThreshold)
-        {
-            return input + 10;
-        }
-
-        throw new InvalidOperationException("Too small");
+        return input <= SuccessThreshold
+            ? input + 10
+            : throw new InvalidOperationException("Too small");
     }
 
-    private StackResult<int, BasicError> StackResultMethod(int input)
+    private StackResult<int, BasicError> StackResultTransform(int input)
     {
-        if (input <= SuccessThreshold)
-        {
-            return StackResult.Success<int, BasicError>(input);
-        }
-
-        return StackResult.Failure<int, BasicError>(new BasicError("Failed"));
+        return input <= SuccessThreshold
+            ? input + 10
+            : new BasicError("Too small");
     }
 
-    private HeapResult<int, BasicError> HeapResultMethod(int input)
+    private HeapResult<int, BasicError> HeapResultTransform(int input)
     {
-        if (input <= SuccessThreshold)
-        {
-            return HeapResult.Success<int, BasicError>(input);
-        }
-
-        return HeapResult.Failure<int, BasicError>(new BasicError("Failed"));
+        return input <= SuccessThreshold
+            ? input + 10
+            : new BasicError("Too small");
     }
-}
 
-public class BasicError(string message) : IError
-{
-    public string Message { get; } = message;
+    private StackResult<int, BasicError> StackTransformValue(int input)
+    {
+        return input <= SuccessThreshold
+            ? input + 10
+            : new BasicError("Too small");
+    }
 
-    public string? Code => throw new NotImplementedException();
+    private HeapResult<int, BasicError> HeapTransformValue(int input)
+    {
+        return input <= SuccessThreshold
+            ? input + 10
+            : new BasicError("Too small");
+    }
+
+    private StackResult<int, BasicError> CallExternalLib_WithStackResult(int input)
+    {
+        try
+        {
+            return ExternalLibraryMethod(input);
+        }
+        catch (Exception ex)
+        {
+            return new BasicError(ex.Message);
+        }
+    }
+
+    private HeapResult<int, BasicError> CallExternalLib_WithHeapResult(int input)
+    {
+        try
+        {
+            return ExternalLibraryMethod(input);
+        }
+        catch (Exception ex)
+        {
+            return new BasicError(ex.Message);
+        }
+    }
+
+    private int TransformDirectly(int input) => input <= SuccessThreshold ? input + 10 : -1;
 }

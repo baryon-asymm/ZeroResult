@@ -14,7 +14,7 @@ try
     Console.WriteLine($"Output directory: {outputRoot}");
 
     GenerateStackResult(outputRoot, version);
-    GenerateHeapResult(outputRoot, version);
+    GenerateResult(outputRoot, version);
 }
 catch (Exception ex)
 {
@@ -64,12 +64,12 @@ static void GenerateStackResult(string outputRoot, string version)
     Generate<OperationsGenerator>("Operations", outputPath, model);
 }
 
-static void GenerateHeapResult(string outputRoot, string version)
+static void GenerateResult(string outputRoot, string version)
 {
     var model = new
     {
         Modifier = "readonly",
-        ResultType = "HeapResult",
+        ResultType = "Result",
         IsStackResult = false,
         Version = version,
         GeneratedAt = DateTime.UtcNow.ToString(),
@@ -81,7 +81,7 @@ static void GenerateHeapResult(string outputRoot, string version)
     Generate<AccessorsGenerator>("Accessors", outputPath, model);
     Generate<ConversionsGenerator>("Conversions", outputPath, model);
     Generate<DataGenerator>("Data", outputPath, model);
-    Generate<CreateOperationsGenerator>("HeapResult.Create", outputPath, model);
+    Generate<CreateOperationsGenerator>("Result.Create", outputPath, model);
 
     outputPath = Path.Combine(outputRoot, "Functional");
     

@@ -4,13 +4,13 @@ using ZeroResult.Errors;
 namespace ZeroResult;
 
 /// <summary>
-/// A heap-allocated Result monad for high-performance scenarios that represents either
+/// A Result monad for high-performance scenarios that represents either
 /// a successful value of type <typeparamref name="T"/> or an error of type <typeparamref name="TError"/>.
 /// </summary>
 /// <typeparam name="T">The type of the successful result value</typeparam>
 /// <typeparam name="TError">The type of the error value, must implement <see cref="IError"/></typeparam>
 [DebuggerDisplay("IsSuccess = {IsSuccess}, Value = {(_isSuccess ? _value : default)}, Error = {(_isSuccess ? default : _error)}")]
-public readonly partial struct HeapResult<T, TError> : IEquatable<HeapResult<T, TError>>
+public readonly partial struct Result<T, TError> : IEquatable<Result<T, TError>>
     where TError : IError
 {
     /// <summary>
@@ -20,15 +20,15 @@ public readonly partial struct HeapResult<T, TError> : IEquatable<HeapResult<T, 
     /// <returns>true if the specified object is equal to the current instance; otherwise, false.</returns>
     public override bool Equals(object? obj)
     {
-        return obj is HeapResult<T, TError> other && Equals(other);
+        return obj is Result<T, TError> other && Equals(other);
     }
 
     /// <summary>
-    /// Determines whether two <see cref="HeapResult{T, TError}"/> instances are equal.
+    /// Determines whether two <see cref="Result{T, TError}"/> instances are equal.
     /// </summary>
     /// <param name="other">The instance to compare with the current instance.</param>
     /// <returns>true if the instances are equal; otherwise, false.</returns>
-    public bool Equals(HeapResult<T, TError> other)
+    public bool Equals(Result<T, TError> other)
     {
         if (_isSuccess != other._isSuccess)
             return false;
@@ -50,23 +50,23 @@ public readonly partial struct HeapResult<T, TError> : IEquatable<HeapResult<T, 
     }
 
     /// <summary>
-    /// Determines whether two specified <see cref="HeapResult{T, TError}"/> instances are equal.
+    /// Determines whether two specified <see cref="Result{T, TError}"/> instances are equal.
     /// </summary>
     /// <param name="left">The first instance to compare.</param>
     /// <param name="right">The second instance to compare.</param>
     /// <returns>true if the instances are equal; otherwise, false.</returns>
-    public static bool operator ==(HeapResult<T, TError> left, HeapResult<T, TError> right)
+    public static bool operator ==(Result<T, TError> left, Result<T, TError> right)
     {
         return left.Equals(right);
     }
 
     /// <summary>
-    /// Determines whether two specified <see cref="HeapResult{T, TError}"/> instances are not equal.
+    /// Determines whether two specified <see cref="Result{T, TError}"/> instances are not equal.
     /// </summary>
     /// <param name="left">The first instance to compare.</param>
     /// <param name="right">The second instance to compare.</param>
     /// <returns>true if the instances are not equal; otherwise, false.</returns>
-    public static bool operator !=(HeapResult<T, TError> left, HeapResult<T, TError> right)
+    public static bool operator !=(Result<T, TError> left, Result<T, TError> right)
     {
         return !(left == right);
     }

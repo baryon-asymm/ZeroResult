@@ -42,12 +42,12 @@ public class MonadBenchmarks : BenchmarkBase
     }
 
     [Benchmark]
-    public int HeapResultMonad()
+    public int ResultMonad()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            var result = HeapResultMethod(Random.Next(100));
+            var result = ResultMethod(Random.Next(100));
             sum += result.Match(
                 onSuccess: x => x,
                 onFailure: _ => -1);
@@ -72,12 +72,12 @@ public class MonadBenchmarks : BenchmarkBase
     }
 
     [Benchmark]
-    public int HeapResult_ExceptionToMonad()
+    public int Result_ExceptionToMonad()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            var result = CallExternalLib_WithHeapResult(Random.Next(100));
+            var result = CallExternalLib_WithResult(Random.Next(100));
             sum += result.Match(
                 onSuccess: x => x,
                 onFailure: _ => -1);
@@ -86,7 +86,7 @@ public class MonadBenchmarks : BenchmarkBase
         return sum;
     }
 
-    private StackResult<int, BasicError> CallExternalLib_WithStackResult(int input)
+    private Result<int, BasicError> CallExternalLib_WithStackResult(int input)
     {
         try
         {
@@ -98,7 +98,7 @@ public class MonadBenchmarks : BenchmarkBase
         }
     }
 
-    private HeapResult<int, BasicError> CallExternalLib_WithHeapResult(int input)
+    private Result<int, BasicError> CallExternalLib_WithResult(int input)
     {
         try
         {

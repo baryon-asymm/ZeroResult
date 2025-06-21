@@ -1,6 +1,6 @@
 namespace ZeroResult.Tests;
 
-public class HeapResultTests
+public class ResultTests
 {
     private readonly BasicError _testError = new("TestError");
     private readonly BasicError _ensureError = new("EnsureError");
@@ -8,7 +8,7 @@ public class HeapResultTests
     [Fact]
     public void SuccessResult_HasCorrectProperties()
     {
-        var result = HeapResult.Success<int, BasicError>(42);
+        var result = Result.Success<int, BasicError>(42);
 
         Assert.True(result.IsSuccess);
         Assert.False(result.IsFailure);
@@ -18,7 +18,7 @@ public class HeapResultTests
     [Fact]
     public void FailureResult_HasCorrectProperties()
     {
-        var result = HeapResult.Failure<int, BasicError>(_testError);
+        var result = Result.Failure<int, BasicError>(_testError);
 
         Assert.False(result.IsSuccess);
         Assert.True(result.IsFailure);
@@ -30,7 +30,7 @@ public class HeapResultTests
     {
         static void Act()
         {
-            var result = HeapResult.Failure<int, BasicError>(new BasicError("Test"));
+            var result = Result.Failure<int, BasicError>(new BasicError("Test"));
             _ = result.Value;
         }
 
@@ -43,7 +43,7 @@ public class HeapResultTests
     {
         static void Act()
         {
-            var result = HeapResult.Success<int, BasicError>(42);
+            var result = Result.Success<int, BasicError>(42);
             _ = result.Error;
         }
 
@@ -54,7 +54,7 @@ public class HeapResultTests
     [Fact]
     public void Map_OnSuccess_TransformsValue()
     {
-        var result = HeapResult.Success<int, BasicError>(42);
+        var result = Result.Success<int, BasicError>(42);
         var mapped = result.Map(x => x.ToString());
 
         Assert.True(mapped.IsSuccess);
@@ -64,7 +64,7 @@ public class HeapResultTests
     [Fact]
     public void Map_OnFailure_ReturnsOriginalError()
     {
-        var result = HeapResult.Failure<int, BasicError>(_testError);
+        var result = Result.Failure<int, BasicError>(_testError);
         var mapped = result.Map(x => x.ToString());
 
         Assert.False(mapped.IsSuccess);
@@ -78,7 +78,7 @@ public class HeapResultTests
     {
         static void Act()
         {
-            var result = HeapResult.Success<int, BasicError>(42);
+            var result = Result.Success<int, BasicError>(42);
             result.Map<int>(null!);
         }
         
@@ -90,12 +90,12 @@ public class HeapResultTests
     [Fact]
     public void Bind_OnSuccess_TransformsToNewResult()
     {
-        static HeapResult<string, BasicError> BindFunc(int value)
+        static Result<string, BasicError> BindFunc(int value)
         {
-            return HeapResult.Success<string, BasicError>(value.ToString());
+            return Result.Success<string, BasicError>(value.ToString());
         }
 
-        var result = HeapResult.Success<int, BasicError>(42);
+        var result = Result.Success<int, BasicError>(42);
         var bound = result.Bind(BindFunc);
         
         Assert.True(bound.IsSuccess);
@@ -105,8 +105,8 @@ public class HeapResultTests
     [Fact]
     public void Bind_OnFailure_ReturnsOriginalError()
     {
-        var result = HeapResult.Failure<int, BasicError>(_testError);
-        var bound = result.Bind(x => HeapResult.Success<string, BasicError>(x.ToString()));
+        var result = Result.Failure<int, BasicError>(_testError);
+        var bound = result.Bind(x => Result.Success<string, BasicError>(x.ToString()));
         
         Assert.False(bound.IsSuccess);
         Assert.Equal(_testError, bound.Error);
@@ -119,7 +119,7 @@ public class HeapResultTests
     {
         static void Act()
         {
-            var result = HeapResult.Success<int, BasicError>(42);
+            var result = Result.Success<int, BasicError>(42);
             result.Bind<int>(null!);
         }
 
@@ -131,7 +131,7 @@ public class HeapResultTests
     [Fact]
     public void Ensure_OnSuccessWithValidPredicate_ReturnsOriginal()
     {
-        var result = HeapResult.Success<int, BasicError>(42)
+        var result = Result.Success<int, BasicError>(42)
             .Ensure(x => x > 0, () => _ensureError);
 
         Assert.True(result.IsSuccess);
@@ -141,7 +141,7 @@ public class HeapResultTests
     [Fact]
     public void Ensure_OnSuccessWithInvalidPredicate_ReturnsError()
     {
-        var result = HeapResult.Success<int, BasicError>(42)
+        var result = Result.Success<int, BasicError>(42)
             .Ensure(x => x < 0, () => _ensureError);
 
         Assert.False(result.IsSuccess);
@@ -151,7 +151,7 @@ public class HeapResultTests
     [Fact]
     public void Ensure_OnFailure_ReturnsOriginalError()
     {
-        var result = HeapResult.Failure<int, BasicError>(_testError)
+        var result = Result.Failure<int, BasicError>(_testError)
             .Ensure(x => x > 0, () => _ensureError);
 
         Assert.False(result.IsSuccess);
@@ -162,7 +162,7 @@ public class HeapResultTests
     public void OnSuccess_ExecutesAction_WhenSuccess()
     {
         bool executed = false;
-        var result = HeapResult.Success<int, BasicError>(42)
+        var result = Result.Success<int, BasicError>(42)
             .OnSuccess(x => executed = true);
 
         Assert.True(executed);
@@ -172,7 +172,7 @@ public class HeapResultTests
     public void OnSuccess_DoesNotExecuteAction_WhenFailure()
     {
         bool executed = false;
-        var result = HeapResult.Failure<int, BasicError>(_testError)
+        var result = Result.Failure<int, BasicError>(_testError)
             .OnSuccess(x => executed = true);
 
         Assert.False(executed);
@@ -182,7 +182,7 @@ public class HeapResultTests
     public void OnFailure_ExecutesAction_WhenFailure()
     {
         bool executed = false;
-        var result = HeapResult.Failure<int, BasicError>(_testError)
+        var result = Result.Failure<int, BasicError>(_testError)
             .OnFailure(x => executed = true);
 
         Assert.True(executed);
@@ -192,7 +192,7 @@ public class HeapResultTests
     public void OnFailure_DoesNotExecuteAction_WhenSuccess()
     {
         bool executed = false;
-        var result = HeapResult.Success<int, BasicError>(42)
+        var result = Result.Success<int, BasicError>(42)
             .OnFailure(x => executed = true);
 
         Assert.False(executed);
@@ -201,7 +201,7 @@ public class HeapResultTests
     [Fact]
     public void Match_OnSuccess_ExecutesSuccessBranch()
     {
-        var result = HeapResult.Success<int, BasicError>(42);
+        var result = Result.Success<int, BasicError>(42);
         var output = result.Match(
             onSuccess: x => x.ToString(),
             onFailure: _ => "error");
@@ -212,7 +212,7 @@ public class HeapResultTests
     [Fact]
     public void Match_OnFailure_ExecutesFailureBranch()
     {
-        var result = HeapResult.Failure<int, BasicError>(_testError);
+        var result = Result.Failure<int, BasicError>(_testError);
         var output = result.Match(
             onSuccess: _ => "success",
             onFailure: e => e.Message);
@@ -226,7 +226,7 @@ public class HeapResultTests
         bool successExecuted = false;
         bool failureExecuted = false;
 
-        var result = HeapResult.Success<int, BasicError>(42);
+        var result = Result.Success<int, BasicError>(42);
         result.Match(
             onSuccess: _ => successExecuted = true,
             onFailure: _ => failureExecuted = true);
@@ -241,7 +241,7 @@ public class HeapResultTests
         bool successExecuted = false;
         bool failureExecuted = false;
 
-        var result = HeapResult.Failure<int, BasicError>(_testError);
+        var result = Result.Failure<int, BasicError>(_testError);
         result.Match(
             onSuccess: _ => successExecuted = true,
             onFailure: _ => failureExecuted = true);
@@ -253,12 +253,12 @@ public class HeapResultTests
     [Fact]
     public void Equality_ComparesCorrectly()
     {
-        var success1 = HeapResult.Success<int, BasicError>(42);
-        var success2 = HeapResult.Success<int, BasicError>(42);
-        var successDifferent = HeapResult.Success<int, BasicError>(100);
-        var failure1 = HeapResult.Failure<int, BasicError>(_testError);
-        var failure2 = HeapResult.Failure<int, BasicError>(_testError);
-        var failureDifferent = HeapResult.Failure<int, BasicError>(_ensureError);
+        var success1 = Result.Success<int, BasicError>(42);
+        var success2 = Result.Success<int, BasicError>(42);
+        var successDifferent = Result.Success<int, BasicError>(100);
+        var failure1 = Result.Failure<int, BasicError>(_testError);
+        var failure2 = Result.Failure<int, BasicError>(_testError);
+        var failureDifferent = Result.Failure<int, BasicError>(_ensureError);
 
         // Equal successes
         Assert.True(success1 == success2);

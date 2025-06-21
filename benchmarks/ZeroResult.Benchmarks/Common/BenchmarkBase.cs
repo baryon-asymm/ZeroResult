@@ -26,11 +26,11 @@ public abstract class BenchmarkBase
             : StackResult.Failure<int, BasicError>(new BasicError("Failed"));
     }
 
-    protected HeapResult<int, BasicError> HeapResultMethod(int input)
+    protected Result<int, BasicError> ResultMethod(int input)
     {
         return input <= SuccessThreshold
-            ? HeapResult.Success<int, BasicError>(input)
-            : HeapResult.Failure<int, BasicError>(new BasicError("Failed"));
+            ? Result.Success<int, BasicError>(input)
+            : Result.Failure<int, BasicError>(new BasicError("Failed"));
     }
 
     protected int ExternalLibraryMethod(int input)

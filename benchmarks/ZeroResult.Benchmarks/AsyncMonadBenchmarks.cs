@@ -27,12 +27,12 @@ public class AsyncMonadBenchmarks : BenchmarkBase
     }
 
     [Benchmark]
-    public async ValueTask<int> HeapResultAsync()
+    public async ValueTask<int> ResultAsync()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            var result = await HeapResultAsyncMethod(Random.Next(100));
+            var result = await ResultAsyncMethod(Random.Next(100));
             sum += await result.MatchAsync(
                 onSuccess: x => ValueTask.FromResult(x),
                 onFailure: _ => ValueTask.FromResult(-1));
@@ -47,9 +47,9 @@ public class AsyncMonadBenchmarks : BenchmarkBase
         return TraditionalMethod(input);
     }
 
-    private async ValueTask<HeapResult<int, BasicError>> HeapResultAsyncMethod(int input)
+    private async ValueTask<Result<int, BasicError>> ResultAsyncMethod(int input)
     {
         await Task.Delay(BenchmarkConstants.AsyncDelayMs);
-        return HeapResultMethod(input);
+        return ResultMethod(input);
     }
 }

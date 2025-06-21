@@ -49,7 +49,7 @@ public class ConversionsGenerator : BaseGenerator
 
     private static string GenerateAsTMethod(dynamic model)
     {
-        var targetType = model.IsStackResult ? "HeapResult" : "StackResult";
+        var targetType = model.IsStackResult ? "Result" : "StackResult";
         var sourceType = model.ResultType;
 
         return

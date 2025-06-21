@@ -71,15 +71,15 @@ public class MapBindBenchmarks : BenchmarkBase
     }
 
     [Benchmark]
-    public int HeapResult_ImperativeStyle()
+    public int Result_ImperativeStyle()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            var result = HeapResultMethod(Random.Next(100));
+            var result = ResultMethod(Random.Next(100));
             if (result.IsSuccess)
             {
-                var transformed = HeapResultTransform(result.Value);
+                var transformed = ResultTransform(result.Value);
                 sum += transformed.IsSuccess ? transformed.Value : -1;
             }
             else
@@ -92,15 +92,15 @@ public class MapBindBenchmarks : BenchmarkBase
     }
 
     [Benchmark]
-    public int HeapResult_ImperativeStyle_ExceptionToMonad()
+    public int Result_ImperativeStyle_ExceptionToMonad()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            var result = CallExternalLib_WithHeapResult(Random.Next(100));
+            var result = CallExternalLib_WithResult(Random.Next(100));
             if (result.IsSuccess)
             {
-                var transformed = HeapResultTransform(result.Value);
+                var transformed = ResultTransform(result.Value);
                 sum += transformed.IsSuccess ? transformed.Value : -1;
             }
             else
@@ -145,13 +145,13 @@ public class MapBindBenchmarks : BenchmarkBase
     }
 
     [Benchmark]
-    public int HeapResult_Bind()
+    public int Result_Bind()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            sum += HeapResultMethod(Random.Next(100))
-                .Bind(HeapTransformValue)
+            sum += ResultMethod(Random.Next(100))
+                .Bind(TransformValue)
                 .Match(
                     onSuccess: x => x,
                     onFailure: _ => -1);
@@ -161,13 +161,13 @@ public class MapBindBenchmarks : BenchmarkBase
     }
 
     [Benchmark]
-    public int HeapResult_Bind_ExceptionToMonad()
+    public int Result_Bind_ExceptionToMonad()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            sum += CallExternalLib_WithHeapResult(Random.Next(100))
-                .Bind(HeapTransformValue)
+            sum += CallExternalLib_WithResult(Random.Next(100))
+                .Bind(TransformValue)
                 .Match(
                     onSuccess: x => x,
                     onFailure: _ => -1);
@@ -209,12 +209,12 @@ public class MapBindBenchmarks : BenchmarkBase
     }
 
     [Benchmark]
-    public int HeapResult_Map()
+    public int Result_Map()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            sum += HeapResultMethod(Random.Next(100))
+            sum += ResultMethod(Random.Next(100))
                 .Map(TransformDirectly)
                 .Match(
                     onSuccess: x => x,
@@ -225,12 +225,12 @@ public class MapBindBenchmarks : BenchmarkBase
     }
 
     [Benchmark]
-    public int HeapResult_Map_ExceptionToMonad()
+    public int Result_Map_ExceptionToMonad()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
         {
-            sum += CallExternalLib_WithHeapResult(Random.Next(100))
+            sum += CallExternalLib_WithResult(Random.Next(100))
                 .Map(TransformDirectly)
                 .Match(
                     onSuccess: x => x,
@@ -254,7 +254,7 @@ public class MapBindBenchmarks : BenchmarkBase
             : new BasicError("Too small");
     }
 
-    private HeapResult<int, BasicError> HeapResultTransform(int input)
+    private Result<int, BasicError> ResultTransform(int input)
     {
         return input <= SuccessThreshold
             ? input + 10
@@ -268,7 +268,7 @@ public class MapBindBenchmarks : BenchmarkBase
             : new BasicError("Too small");
     }
 
-    private HeapResult<int, BasicError> HeapTransformValue(int input)
+    private Result<int, BasicError> TransformValue(int input)
     {
         return input <= SuccessThreshold
             ? input + 10
@@ -287,7 +287,7 @@ public class MapBindBenchmarks : BenchmarkBase
         }
     }
 
-    private HeapResult<int, BasicError> CallExternalLib_WithHeapResult(int input)
+    private Result<int, BasicError> CallExternalLib_WithResult(int input)
     {
         try
         {

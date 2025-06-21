@@ -1,6 +1,6 @@
 namespace ZeroResult.Tests;
 
-public class HeapResultAsyncTests
+public class ResultAsyncTests
 {
     private readonly BasicError _testError = new("TestError");
     private readonly BasicError _ensureError = new("EnsureError");
@@ -8,7 +8,7 @@ public class HeapResultAsyncTests
     [Fact]
     public async Task MapAsync_OnSuccess_TransformsValue()
     {
-        var result = HeapResult.Success<int, BasicError>(42);
+        var result = Result.Success<int, BasicError>(42);
         var mapped = await result.MapAsync(x => ValueTask.FromResult(x.ToString()));
 
         Assert.True(mapped.IsSuccess);
@@ -18,7 +18,7 @@ public class HeapResultAsyncTests
     [Fact]
     public async Task MapAsync_OnFailure_ReturnsOriginalError()
     {
-        var result = HeapResult.Failure<int, BasicError>(_testError);
+        var result = Result.Failure<int, BasicError>(_testError);
         var mapped = await result.MapAsync(x => ValueTask.FromResult(x.ToString()));
 
         Assert.False(mapped.IsSuccess);
@@ -32,7 +32,7 @@ public class HeapResultAsyncTests
     {
         async Task Act()
         {
-            var result = HeapResult.Success<int, BasicError>(42);
+            var result = Result.Success<int, BasicError>(42);
             await result.MapAsync<int>(null!);
         }
         
@@ -44,12 +44,12 @@ public class HeapResultAsyncTests
     [Fact]
     public async Task BindAsync_OnSuccess_TransformsToNewResult()
     {
-        static ValueTask<HeapResult<string, BasicError>> BindFunc(int value)
+        static ValueTask<Result<string, BasicError>> BindFunc(int value)
         {
-            return ValueTask.FromResult(HeapResult.Success<string, BasicError>(value.ToString()));
+            return ValueTask.FromResult(Result.Success<string, BasicError>(value.ToString()));
         }
 
-        var result = HeapResult.Success<int, BasicError>(42);
+        var result = Result.Success<int, BasicError>(42);
         var bound = await result.BindAsync(BindFunc);
 
         Assert.True(bound.IsSuccess);
@@ -59,9 +59,9 @@ public class HeapResultAsyncTests
     [Fact]
     public async Task BindAsync_OnFailure_ReturnsOriginalError()
     {
-        var result = HeapResult.Failure<int, BasicError>(_testError);
+        var result = Result.Failure<int, BasicError>(_testError);
         var bound = await result.BindAsync(x =>
-            ValueTask.FromResult(HeapResult.Success<string, BasicError>(x.ToString())));
+            ValueTask.FromResult(Result.Success<string, BasicError>(x.ToString())));
 
         Assert.False(bound.IsSuccess);
         Assert.Equal(_testError, bound.Error);
@@ -74,7 +74,7 @@ public class HeapResultAsyncTests
     {
         async Task Act()
         {
-            var result = HeapResult.Success<int, BasicError>(42);
+            var result = Result.Success<int, BasicError>(42);
             await result.BindAsync<int>(null!);
         }
 
@@ -86,7 +86,7 @@ public class HeapResultAsyncTests
     [Fact]
     public async Task EnsureAsync_OnSuccessWithValidPredicate_ReturnsOriginal()
     {
-        var result = await HeapResult.Success<int, BasicError>(42)
+        var result = await Result.Success<int, BasicError>(42)
             .EnsureAsync(
                 x => ValueTask.FromResult(x > 0),
                 () => ValueTask.FromResult(_ensureError));
@@ -98,7 +98,7 @@ public class HeapResultAsyncTests
     [Fact]
     public async Task EnsureAsync_OnSuccessWithInvalidPredicate_ReturnsError()
     {
-        var result = await HeapResult.Success<int, BasicError>(42)
+        var result = await Result.Success<int, BasicError>(42)
             .EnsureAsync(
                 x => ValueTask.FromResult(x < 0),
                 () => ValueTask.FromResult(_ensureError));
@@ -110,7 +110,7 @@ public class HeapResultAsyncTests
     [Fact]
     public async Task EnsureAsync_OnFailure_ReturnsOriginalError()
     {
-        var result = await HeapResult.Failure<int, BasicError>(_testError)
+        var result = await Result.Failure<int, BasicError>(_testError)
             .EnsureAsync(
                 x => ValueTask.FromResult(x > 0),
                 () => ValueTask.FromResult(_ensureError));
@@ -123,7 +123,7 @@ public class HeapResultAsyncTests
     public async Task OnSuccessAsync_ExecutesAction_WhenSuccess()
     {
         bool executed = false;
-        var result = await HeapResult.Success<int, BasicError>(42)
+        var result = await Result.Success<int, BasicError>(42)
             .OnSuccessAsync(x =>
             {
                 executed = true;
@@ -137,7 +137,7 @@ public class HeapResultAsyncTests
     public async Task OnSuccessAsync_DoesNotExecuteAction_WhenFailure()
     {
         bool executed = false;
-        var result = await HeapResult.Failure<int, BasicError>(_testError)
+        var result = await Result.Failure<int, BasicError>(_testError)
             .OnSuccessAsync(x =>
             {
                 executed = true;
@@ -151,7 +151,7 @@ public class HeapResultAsyncTests
     public async Task OnFailureAsync_ExecutesAction_WhenFailure()
     {
         bool executed = false;
-        var result = await HeapResult.Failure<int, BasicError>(_testError)
+        var result = await Result.Failure<int, BasicError>(_testError)
             .OnFailureAsync(x =>
             {
                 executed = true;
@@ -165,7 +165,7 @@ public class HeapResultAsyncTests
     public async Task OnFailureAsync_DoesNotExecuteAction_WhenSuccess()
     {
         bool executed = false;
-        var result = await HeapResult.Success<int, BasicError>(42)
+        var result = await Result.Success<int, BasicError>(42)
             .OnFailureAsync(x =>
             {
                 executed = true;
@@ -178,7 +178,7 @@ public class HeapResultAsyncTests
     [Fact]
     public async Task MatchAsync_OnSuccess_ExecutesSuccessBranch()
     {
-        var result = HeapResult.Success<int, BasicError>(42);
+        var result = Result.Success<int, BasicError>(42);
         var output = await result.MatchAsync(
             onSuccess: x => ValueTask.FromResult(x.ToString()),
             onFailure: _ => ValueTask.FromResult("error"));
@@ -189,7 +189,7 @@ public class HeapResultAsyncTests
     [Fact]
     public async Task MatchAsync_OnFailure_ExecutesFailureBranch()
     {
-        var result = HeapResult.Failure<int, BasicError>(_testError);
+        var result = Result.Failure<int, BasicError>(_testError);
         var output = await result.MatchAsync(
             onSuccess: _ => ValueTask.FromResult("success"),
             onFailure: e => ValueTask.FromResult(e.Message));
@@ -203,7 +203,7 @@ public class HeapResultAsyncTests
         bool successExecuted = false;
         bool failureExecuted = false;
 
-        var result = HeapResult.Success<int, BasicError>(42);
+        var result = Result.Success<int, BasicError>(42);
         await result.MatchAsync(
             onSuccess: _ =>
             {
@@ -226,7 +226,7 @@ public class HeapResultAsyncTests
         bool successExecuted = false;
         bool failureExecuted = false;
 
-        var result = HeapResult.Failure<int, BasicError>(_testError);
+        var result = Result.Failure<int, BasicError>(_testError);
         await result.MatchAsync(
             onSuccess: _ =>
             {
@@ -253,7 +253,7 @@ public class HeapResultAsyncTests
             return value;
         }
 
-        var result = HeapResult.Success<int, BasicError>(42);
+        var result = Result.Success<int, BasicError>(42);
         var mapped = await result.MapAsync(DelayedSuccess);
 
         Assert.True(mapped.IsSuccess);
@@ -268,7 +268,7 @@ public class HeapResultAsyncTests
             return ValueTask.FromException<int>(new InvalidOperationException("Test exception"));
         }
 
-        var result = HeapResult.Success<int, BasicError>(42);
+        var result = Result.Success<int, BasicError>(42);
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             result.MapAsync(FaultedMap).AsTask());
     }

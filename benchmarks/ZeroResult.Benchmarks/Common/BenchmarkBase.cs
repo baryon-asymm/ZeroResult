@@ -9,7 +9,7 @@ public abstract class BenchmarkBase
     [Params(0, 75, 100)]
     public int SuccessThreshold { get; set; }
 
-    [Params(100, 1000)]
+    [Params(100)]
     public int Iterations { get; set; }
 
     protected int TraditionalMethod(int input)

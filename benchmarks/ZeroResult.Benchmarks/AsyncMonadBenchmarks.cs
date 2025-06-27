@@ -4,11 +4,11 @@ using ZeroResult.Benchmarks.Common;
 namespace ZeroResult.Benchmarks;
 
 [MemoryDiagnoser]
-[ShortRunJob]
+[RankColumn]
 public class AsyncMonadBenchmarks : BenchmarkBase
 {
     [Benchmark(Baseline = true)]
-    public async Task<int> ExceptionHandlingAsync()
+    public async Task<int> TryCatchAsync()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)
@@ -27,7 +27,7 @@ public class AsyncMonadBenchmarks : BenchmarkBase
     }
 
     [Benchmark]
-    public async ValueTask<int> ResultAsync()
+    public async ValueTask<int> ZeroResultAsync()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)

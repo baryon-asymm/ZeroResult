@@ -4,11 +4,11 @@ using ZeroResult.Benchmarks.Common;
 namespace ZeroResult.Benchmarks;
 
 [MemoryDiagnoser]
-[ShortRunJob]
+[RankColumn]
 public class MonadBenchmarks : BenchmarkBase
 {
     [Benchmark(Baseline = true)]
-    public int ExceptionHandling()
+    public int TryCatchHandling()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)

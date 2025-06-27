@@ -4,11 +4,11 @@ using ZeroResult.Benchmarks.Common;
 namespace ZeroResult.Benchmarks;
 
 [MemoryDiagnoser]
-[ShortRunJob]
+[RankColumn]
 public class MapBindBenchmarks : BenchmarkBase
 {
     [Benchmark(Baseline = true)]
-    public int ExceptionHandlingChaining()
+    public int TryCatchChaining()
     {
         int sum = 0;
         for (int i = 0; i < Iterations; i++)

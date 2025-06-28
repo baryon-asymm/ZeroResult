@@ -10,7 +10,7 @@ public class MultiErrorBenchmarks
     [Params(20, 200)]
     public int CallDepth { get; set; }
 
-    [Params(1000)]
+    [Params(2000)]
     public int Iterations { get; set; }
 
     private readonly Random _random = new(42);

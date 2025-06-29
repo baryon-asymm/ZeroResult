@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 1.2.3)'
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8 and 9
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          8.x
+          9.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release
+
+    - name: Test
+      run: dotnet test --configuration Release --verbosity normal
+
+    - name: Get latest commit message
+      id: get_commit
+      run: |
+        message=$(git log -1 --pretty=format:"%s")
+        echo "message=$message" >> $GITHUB_OUTPUT
+
+    - name: Create tag and push
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@github.com"
+        git tag v${{ github.event.inputs.version }}
+        git push origin v${{ github.event.inputs.version }}
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ github.event.inputs.version }}
+        name: Release v${{ github.event.inputs.version }}
+        body: ${{ steps.get_commit.outputs.message }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Pack NuGet
+      run: dotnet pack .\src\ZeroResult\ZeroResult.csproj --configuration Release --include-symbols --include-source /p:SymbolPackageFormat=snupkg --no-build --output ./nupkg /p:PackageVersion=${{ github.event.inputs.version }}
+
+    - name: Publish NuGet package
+      run: |
+        dotnet nuget push "./nupkg/*.nupkg" --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
+        dotnet nuget push "./nupkg/*.snupkg" --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}

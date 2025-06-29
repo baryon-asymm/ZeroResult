@@ -12,6 +12,22 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <Title>ZeroResult</Title>
+    <Authors>Eduard Burachek</Authors>
+    <Description>ZeroResult provides allocation-free result monads for .NET 8+ with full async support and fluent APIs. Perfect for high-performance applications where traditional exception handling is too costly.</Description>
+    <Copyright>Copyright (c) Eduard Burachek, 2025</Copyright>
+    <PackageProjectUrl>https://github.com/baryon-asymm/ZeroResult</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/baryon-asymm/ZeroResult</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>csharp error-handling zero-allocation result-monad</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../LICENSE" Pack="true" PackagePath="\" />
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>

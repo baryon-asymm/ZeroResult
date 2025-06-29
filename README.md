@@ -88,10 +88,10 @@ Result<User, ValidationError> ValidateUser(User user)
 ```csharp
 async ValueTask<Result<Report, BusinessError>> GenerateReportAsync(int userId)
 {
-    return await GetUserAsync(userId)
+    return await GetUser(userId)
         .Map(user => new ReportRequest(user))
-        .BindAsync(request => ValidateRequest(request))
-        .MapAsync(validRequest => GenerateReport(validRequest));
+        .BindAsync(async request => await ValidateRequestAsync(request))
+        .MapAsync(async validRequest => await GenerateReportAsync(validRequest));
 }
 ```
 

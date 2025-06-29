@@ -54,7 +54,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Pack NuGet
-      run: dotnet pack .\src\ZeroResult\ZeroResult.csproj --configuration Release --include-symbols --include-source /p:SymbolPackageFormat=snupkg --no-build --output ./nupkg /p:PackageVersion=${{ github.event.inputs.version }}
+      run: dotnet pack ./src/ZeroResult/ZeroResult.csproj --configuration Release --include-symbols --include-source /p:SymbolPackageFormat=snupkg --no-build --output ./nupkg /p:PackageVersion=${{ github.event.inputs.version }}
 
     - name: Publish NuGet package
       run: |

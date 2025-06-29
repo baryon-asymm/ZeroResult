@@ -45,6 +45,14 @@ public class ConversionsGenerator : BaseGenerator
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static implicit operator ValueTask<{{ResultType}}<T, TError>>({{ResultType}}<T, TError> result)
                 => new(result);
+            
+            /// <summary>
+            /// Implicitly converts a <see cref="{{ResultType}}{T, TError}"/> to a completed <see cref="Task"/> of <see cref="{{ResultType}}{T, TError}"/>.
+            /// </summary>
+            /// <param name="result">The result to convert</param>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static implicit operator Task<{{ResultType}}<T, TError>>({{ResultType}}<T, TError> result)
+                => Task.FromResult(result);
         """;
 
     private static string GenerateAsTMethod(dynamic model)

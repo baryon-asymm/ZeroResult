@@ -69,14 +69,14 @@ public class MappingTests
     public void Map_ShouldThrow_WhenMapperIsNull()
     {
         var result = Result.Success<int, BasicError>(42);
-        Assert.Throws<NullReferenceException>(() => result.Map<int>(null!));
+        Assert.ThrowsAsync<NullReferenceException>(() => result.Map<int>(null!));
     }
 
     [Fact]
     public void Bind_ShouldThrow_WhenBinderIsNull()
     {
         var result = Result.Success<int, BasicError>(42);
-        Assert.Throws<NullReferenceException>(() => result.Bind<int>(null!));
+        Assert.ThrowsAsync<NullReferenceException>(() => result.Bind<int>(null!));
     }
 
 #endif

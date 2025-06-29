@@ -1,3 +1,5 @@
+using ZeroResult.Errors;
+
 namespace ZeroResult.Tests;
 
 public class AsyncOperationsTests

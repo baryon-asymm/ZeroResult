@@ -72,7 +72,7 @@ static void GenerateResult(string outputRoot, string version)
         ResultType = "Result",
         IsStackResult = false,
         Version = version,
-        GeneratedAt = DateTime.UtcNow.ToString(),
+        GeneratedAt = DateTime.UtcNow.ToShortDateString(),
         TargetFramework = "net8.0+"
     };
 
@@ -115,7 +115,6 @@ static void Generate<T>(string component, string outputRoot, dynamic model)
 static string GetVersion()
 {
     var assembly = Assembly.GetEntryAssembly()!;
-    return assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion 
-        ?? assembly.GetName().Version?.ToString() 
-        ?? "1.0.0";
+    return assembly.GetName().Version?.ToString(fieldCount: 3) 
+        ?? "0.0.0";
 }

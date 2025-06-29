@@ -1,7 +1,7 @@
 # ZeroResult: High-Performance Result Monads for .NET 🌟
 
 [![NuGet](https://img.shields.io/nuget/v/ZeroResult.svg)](https://www.nuget.org/packages/ZeroResult/)
-[![CI](https://github.com/yourusername/ZeroResult/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/ZeroResult/actions)
+[![CI](https://github.com/baryon-asymm/ZeroResult/actions/workflows/ci.yml/badge.svg)](https://github.com/baryon-asymm/ZeroResult/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ZeroResult provides allocation-free result monads for .NET 8+ with full async support and fluent APIs. Perfect for high-performance applications where traditional exception handling is too costly.

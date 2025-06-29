@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>ZeroResult.Benchmarks.AsyncMonadBenchmarks-20250629-160155</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.15.1, Windows 11 (10.0.26100.4484/24H2/2024Update/HudsonValley)
+AMD Ryzen 7 7800X3D 4.20GHz, 1 CPU, 16 logical and 8 physical cores
+.NET SDK 9.0.205
+  [Host]     : .NET 9.0.6 (9.0.625.26613), X64 RyuJIT AVX-512F+CD+BW+DQ+VL+VBMI
+  DefaultJob : .NET 9.0.6 (9.0.625.26613), X64 RyuJIT AVX-512F+CD+BW+DQ+VL+VBMI
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>Method   </th><th>SuccessThreshold</th><th>Iterations</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Ratio</th><th>Rank</th><th>Allocated</th><th>Alloc Ratio</th>
+</tr>
+</thead><tbody><tr><td>TryCatchAsync</td><td>0</td><td>2000</td><td>30.93 s</td><td>0.037 s</td><td>0.035 s</td><td>1.00</td><td>1</td><td>2770.53 KB</td><td>1.00</td>
+</tr><tr><td>ZeroResultAsync</td><td>0</td><td>2000</td><td>30.90 s</td><td>0.022 s</td><td>0.020 s</td><td>1.00</td><td>1</td><td>625.27 KB</td><td>0.23</td>
+</tr><tr><td>TryCatchAsync</td><td>75</td><td>2000</td><td>30.87 s</td><td>0.038 s</td><td>0.035 s</td><td>1.00</td><td>1</td><td>1058.05 KB</td><td>1.00</td>
+</tr><tr><td>ZeroResultAsync</td><td>75</td><td>2000</td><td>30.90 s</td><td>0.022 s</td><td>0.019 s</td><td>1.00</td><td>1</td><td>589.83 KB</td><td>0.56</td>
+</tr><tr><td>TryCatchAsync</td><td>100</td><td>2000</td><td>30.91 s</td><td>0.036 s</td><td>0.034 s</td><td>1.00</td><td>1</td><td>532.09 KB</td><td>1.00</td>
+</tr><tr><td>ZeroResultAsync</td><td>100</td><td>2000</td><td>30.94 s</td><td>0.045 s</td><td>0.042 s</td><td>1.00</td><td>1</td><td>578.95 KB</td><td>1.09</td>
+</tr></tbody></table>
+</body>
+</html>

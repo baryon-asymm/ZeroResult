@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>ZeroResult.Benchmarks.MonadBenchmarks-20250629-193730</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.15.1, macOS Sequoia 15.5 (24F74) [Darwin 24.5.0]
+Apple M2, 1 CPU, 8 logical and 8 physical cores
+.NET SDK 9.0.203
+  [Host]     : .NET 9.0.4 (9.0.425.16305), Arm64 RyuJIT AdvSIMD
+  DefaultJob : .NET 9.0.4 (9.0.425.16305), Arm64 RyuJIT AdvSIMD
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>Method                </th><th>SuccessThreshold</th><th>Iterations</th><th>Mean  </th><th>Error</th><th>StdDev</th><th>Ratio</th><th>RatioSD</th><th>Rank</th><th>Gen0</th><th>Allocated</th><th>Alloc Ratio</th>
+</tr>
+</thead><tbody><tr><td>TryCatchHandling</td><td>0</td><td>2000</td><td>18,249.14 &mu;s</td><td>51.275 &mu;s</td><td>40.032 &mu;s</td><td>1.000</td><td>0.00</td><td>2</td><td>31.2500</td><td>428040 B</td><td>1.00</td>
+</tr><tr><td>StackResultMonad</td><td>0</td><td>2000</td><td>19.09 &mu;s</td><td>0.016 &mu;s</td><td>0.015 &mu;s</td><td>0.001</td><td>0.00</td><td>1</td><td>5.6763</td><td>47519 B</td><td>0.11</td>
+</tr><tr><td>ResultMonad</td><td>0</td><td>2000</td><td>19.18 &mu;s</td><td>0.018 &mu;s</td><td>0.016 &mu;s</td><td>0.001</td><td>0.00</td><td>1</td><td>5.6763</td><td>47519 B</td><td>0.11</td>
+</tr><tr><td>StackResult_ExceptionToMonad</td><td>0</td><td>2000</td><td>18,026.76 &mu;s</td><td>38.894 &mu;s</td><td>34.478 &mu;s</td><td>0.988</td><td>0.00</td><td>2</td><td>31.2500</td><td>475577 B</td><td>1.11</td>
+</tr><tr><td>Result_ExceptionToMonad</td><td>0</td><td>2000</td><td>18,036.52 &mu;s</td><td>73.063 &mu;s</td><td>68.343 &mu;s</td><td>0.988</td><td>0.00</td><td>2</td><td>31.2500</td><td>475598 B</td><td>1.11</td>
+</tr><tr><td>TryCatchHandling</td><td>75</td><td>2000</td><td>4,340.78 &mu;s</td><td>21.091 &mu;s</td><td>19.729 &mu;s</td><td>1.000</td><td>0.01</td><td>2</td><td>7.8125</td><td>103600 B</td><td>1.00</td>
+</tr><tr><td>StackResultMonad</td><td>75</td><td>2000</td><td>22.22 &mu;s</td><td>0.038 &mu;s</td><td>0.034 &mu;s</td><td>0.005</td><td>0.00</td><td>1</td><td>1.3733</td><td>11518 B</td><td>0.11</td>
+</tr><tr><td>ResultMonad</td><td>75</td><td>2000</td><td>22.20 &mu;s</td><td>0.044 &mu;s</td><td>0.039 &mu;s</td><td>0.005</td><td>0.00</td><td>1</td><td>1.3733</td><td>11518 B</td><td>0.11</td>
+</tr><tr><td>StackResult_ExceptionToMonad</td><td>75</td><td>2000</td><td>4,482.22 &mu;s</td><td>28.728 &mu;s</td><td>26.872 &mu;s</td><td>1.033</td><td>0.01</td><td>2</td><td>7.8125</td><td>115110 B</td><td>1.11</td>
+</tr><tr><td>Result_ExceptionToMonad</td><td>75</td><td>2000</td><td>4,366.14 &mu;s</td><td>27.534 &mu;s</td><td>25.755 &mu;s</td><td>1.006</td><td>0.01</td><td>2</td><td>7.8125</td><td>115110 B</td><td>1.11</td>
+</tr><tr><td>TryCatchHandling</td><td>100</td><td>2000</td><td>13.86 &mu;s</td><td>0.012 &mu;s</td><td>0.011 &mu;s</td><td>1.00</td><td>0.00</td><td>1</td><td>-</td><td>-</td><td>NA</td>
+</tr><tr><td>StackResultMonad</td><td>100</td><td>2000</td><td>14.39 &mu;s</td><td>0.004 &mu;s</td><td>0.004 &mu;s</td><td>1.04</td><td>0.00</td><td>2</td><td>-</td><td>-</td><td>NA</td>
+</tr><tr><td>ResultMonad</td><td>100</td><td>2000</td><td>14.21 &mu;s</td><td>0.003 &mu;s</td><td>0.002 &mu;s</td><td>1.03</td><td>0.00</td><td>2</td><td>-</td><td>-</td><td>NA</td>
+</tr><tr><td>StackResult_ExceptionToMonad</td><td>100</td><td>2000</td><td>15.97 &mu;s</td><td>0.242 &mu;s</td><td>0.227 &mu;s</td><td>1.15</td><td>0.02</td><td>3</td><td>-</td><td>-</td><td>NA</td>
+</tr><tr><td>Result_ExceptionToMonad</td><td>100</td><td>2000</td><td>15.83 &mu;s</td><td>0.035 &mu;s</td><td>0.033 &mu;s</td><td>1.14</td><td>0.00</td><td>3</td><td>-</td><td>-</td><td>NA</td>
+</tr></tbody></table>
+</body>
+</html>

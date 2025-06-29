@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>ZeroResult.Benchmarks.MonadBenchmarks-20250629-154948</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.15.1, Windows 11 (10.0.26100.4484/24H2/2024Update/HudsonValley)
+AMD Ryzen 7 7800X3D 4.20GHz, 1 CPU, 16 logical and 8 physical cores
+.NET SDK 9.0.205
+  [Host]     : .NET 9.0.6 (9.0.625.26613), X64 RyuJIT AVX-512F+CD+BW+DQ+VL+VBMI
+  DefaultJob : .NET 9.0.6 (9.0.625.26613), X64 RyuJIT AVX-512F+CD+BW+DQ+VL+VBMI
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>Method                </th><th>SuccessThreshold</th><th>Iterations</th><th>Mean </th><th>Error</th><th>StdDev</th><th>Ratio</th><th>Rank</th><th>Gen0</th><th>Allocated</th><th>Alloc Ratio</th>
+</tr>
+</thead><tbody><tr><td>TryCatchHandling</td><td>0</td><td>2000</td><td>2,482.04 &mu;s</td><td>26.563 &mu;s</td><td>24.847 &mu;s</td><td>1.000</td><td>2</td><td>7.8125</td><td>427710 B</td><td>1.00</td>
+</tr><tr><td>StackResultMonad</td><td>0</td><td>2000</td><td>16.60 &mu;s</td><td>0.070 &mu;s</td><td>0.058 &mu;s</td><td>0.007</td><td>1</td><td>0.9460</td><td>47519 B</td><td>0.11</td>
+</tr><tr><td>ResultMonad</td><td>0</td><td>2000</td><td>16.46 &mu;s</td><td>0.040 &mu;s</td><td>0.033 &mu;s</td><td>0.007</td><td>1</td><td>0.9460</td><td>47519 B</td><td>0.11</td>
+</tr><tr><td>StackResult_ExceptionToMonad</td><td>0</td><td>2000</td><td>2,508.62 &mu;s</td><td>10.338 &mu;s</td><td>8.633 &mu;s</td><td>1.011</td><td>2</td><td>7.8125</td><td>475233 B</td><td>1.11</td>
+</tr><tr><td>Result_ExceptionToMonad</td><td>0</td><td>2000</td><td>2,509.58 &mu;s</td><td>23.374 &mu;s</td><td>21.864 &mu;s</td><td>1.011</td><td>2</td><td>7.8125</td><td>475233 B</td><td>1.11</td>
+</tr><tr><td>TryCatchHandling</td><td>75</td><td>2000</td><td>626.61 &mu;s</td><td>3.442 &mu;s</td><td>3.052 &mu;s</td><td>1.00</td><td>2</td><td>1.9531</td><td>103486 B</td><td>1.00</td>
+</tr><tr><td>StackResultMonad</td><td>75</td><td>2000</td><td>19.65 &mu;s</td><td>0.048 &mu;s</td><td>0.040 &mu;s</td><td>0.03</td><td>1</td><td>0.2136</td><td>11518 B</td><td>0.11</td>
+</tr><tr><td>ResultMonad</td><td>75</td><td>2000</td><td>20.05 &mu;s</td><td>0.055 &mu;s</td><td>0.046 &mu;s</td><td>0.03</td><td>1</td><td>0.2136</td><td>11518 B</td><td>0.11</td>
+</tr><tr><td>StackResult_ExceptionToMonad</td><td>75</td><td>2000</td><td>635.12 &mu;s</td><td>3.320 &mu;s</td><td>3.105 &mu;s</td><td>1.01</td><td>2</td><td>1.9531</td><td>114984 B</td><td>1.11</td>
+</tr><tr><td>Result_ExceptionToMonad</td><td>75</td><td>2000</td><td>629.65 &mu;s</td><td>2.313 &mu;s</td><td>1.806 &mu;s</td><td>1.00</td><td>2</td><td>1.9531</td><td>114984 B</td><td>1.11</td>
+</tr><tr><td>TryCatchHandling</td><td>100</td><td>2000</td><td>14.01 &mu;s</td><td>0.041 &mu;s</td><td>0.038 &mu;s</td><td>1.00</td><td>2</td><td>-</td><td>-</td><td>NA</td>
+</tr><tr><td>StackResultMonad</td><td>100</td><td>2000</td><td>13.58 &mu;s</td><td>0.031 &mu;s</td><td>0.029 &mu;s</td><td>0.97</td><td>1</td><td>-</td><td>-</td><td>NA</td>
+</tr><tr><td>ResultMonad</td><td>100</td><td>2000</td><td>13.92 &mu;s</td><td>0.027 &mu;s</td><td>0.025 &mu;s</td><td>0.99</td><td>2</td><td>-</td><td>-</td><td>NA</td>
+</tr><tr><td>StackResult_ExceptionToMonad</td><td>100</td><td>2000</td><td>18.14 &mu;s</td><td>0.061 &mu;s</td><td>0.054 &mu;s</td><td>1.30</td><td>3</td><td>-</td><td>-</td><td>NA</td>
+</tr><tr><td>Result_ExceptionToMonad</td><td>100</td><td>2000</td><td>18.58 &mu;s</td><td>0.044 &mu;s</td><td>0.039 &mu;s</td><td>1.33</td><td>3</td><td>-</td><td>-</td><td>NA</td>
+</tr></tbody></table>
+</body>
+</html>

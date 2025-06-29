@@ -48,7 +48,7 @@ static void GenerateStackResult(string outputRoot, string version)
         ResultType = "StackResult",
         IsStackResult = true,
         Version = version,
-        GeneratedAt = DateTime.UtcNow.ToString(),
+        GeneratedAt = DateTime.UtcNow.ToShortDateString(),
         TargetFramework = "net8.0+"
     };
 

@@ -300,7 +300,10 @@ StackResult<Transaction, MultiError> ValidateTransaction(Transaction tx)
 
 ## Performance ⚡
 
-ZeroResult dramatically outperforms traditional exception handling, especially in deep call stacks and error scenarios. Benchmarks run on .NET 9.0.6 with AMD Ryzen 7 7800X3D.
+ZeroResult dramatically outperforms traditional exception handling, especially in deep call stacks and error scenarios. Benchmarks were run on **.NET 9.0.6** using **BenchmarkDotNet v0.15.1**, with results collected from two major platforms:
+
+- **Windows x64**: AMD Ryzen 7 7800X3D
+- **macOS Arm64**: Apple M2
 
 ### Key Findings:
 - **100-180x faster** than exceptions in method chaining scenarios
@@ -345,6 +348,8 @@ ZeroResult dramatically outperforms traditional exception handling, especially i
 4. **Fluent APIs:** Add just **10μs overhead** vs imperative style while being more expressive
 5. **Memory Efficiency:** Dramatically reduces GC pressure in error scenarios
 
+If you're interested in the full benchmark results or want to explore detailed metrics for specific scenarios, check out the [**benchmark results folder**](./benchmarks/results/).
+
 ---
 
-**ZeroResult** - Where performance meets reliability in .NET error handling. Contribute on [GitHub](https://github.com/yourusername/ZeroResult)!
+**ZeroResult** - Where performance meets reliability in .NET error handling. Contribute on [GitHub](https://github.com/baryon-asymm/ZeroResult)!
